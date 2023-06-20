@@ -1,0 +1,19 @@
+{
+  "name": "scraping",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scraping.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^4.7.0",
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "mongodb": "^5.6.0",
+    "twitter-api-v2": "^1.15.0"
+  }
+}
