@@ -3,7 +3,6 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from pyarabic import normalize_text
 
 # MongoDB connection URL
 mongo_url = 'mongodb://localhost:27017/'
@@ -21,10 +20,7 @@ input_data = []
 ids = []  
 
 for item in data:
-    title = normalize_text(item['title'])
-    description = normalize_text(item['description'])
-    zone = normalize_text(item['zone'])
-    input_data.append(title + ' ' + description + ' ' + zone)
+    input_data.append(item['title'] + ' ' +item ['description'] + ' ' +item ['zone'])
     ids.append(item['_id'])
 
 input_data = np.array(input_data)

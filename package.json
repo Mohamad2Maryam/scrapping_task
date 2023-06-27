@@ -2,7 +2,7 @@
   "name": "scraping",
   "version": "1.0.0",
   "description": "",
-  "main": "scraping.js",
+  "main": "twitter.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +13,14 @@
     "@tensorflow/tfjs-node": "^4.7.0",
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
+    "fs": "^0.0.1-security",
     "mongodb": "^5.6.0",
-    "twitter-api-v2": "^1.15.0"
+    "needle": "^3.2.0",
+    "puppeteer": "^20.7.3",
+    "request": "^2.88.2",
+    "twitter": "^1.7.1",
+    "twitter-api-client": "^1.6.1",
+    "twitter-api-v2": "^1.15.0",
+    "twitter-lite": "^1.1.0"
   }
 }

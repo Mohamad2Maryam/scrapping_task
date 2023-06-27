@@ -1,29 +1,26 @@
-const { TwitterApi } = require('twitter-api-v2');
+const {TwitterApi} = require('twitter-api-v2');
 
 // Set up your Twitter API credentials
 const client = new TwitterApi({
-  appKey: '4zbaESwPk4YxOvminARxSPvV',
-  appSecret: 'A5fI9WNEUAPuumZdAo7f4vK2A6HD2QRa5g0lnLAgFZaRNY09Zd',
-  accessToken: '1551934309115764737-ESM1ZSLgi0LpZs2tdREc3EykqCWTxj',
-  accessSecret: 'xg64EgCyYMmZ5qkgvoJ728uaf3sfg0n4FaRuaIndRoTJk',
-  subdomain: 'api',
+  appKey: 'HDt8NUTpk8CHvLQUjYKEdqPsM',
+  appSecret: 'km3jSWRHWqBqMOI1jrAlVPg2eSvillUMLknVWx1AwMikbxm98g',
+  accessToken: '1551934309115764737-TYWpP3ktevafJktdJELD5FCGywWjSN',
+  accessSecret: 'uB4yqNDUnhWbt0FwuZ2fjwdZ78kppmY9ZtSc5761fwE0i',
 });
 
-// Make a request to the Twitter API
-const getUserTweets = async (username) => {
-  try {
-    const user = await client.v2.userByUsername(username);
-    const { data } = await user.tweets();
 
-    // Process the response data
-    data.forEach((tweet) => {
-      console.log(tweet.text);
-      console.log("--------------------");
-    });
-  } catch (error) {
-    console.log("An error occurred:", error);
-  }
-};
+const tweetText = 'Hello, Twitter! This is my first tweet using Twitter.';
 
-// Usage example
-getUserTweets('burgerkingksa');
+// Post a tweet
+client.v2.post('tweets', { text: tweetText })
+  .then((response) => {
+    console.log('Tweet posted successfully!');
+    console.log('Tweet ID:', response.data.id);
+    console.log('Created at:', response.data.created_at);
+  })
+  .catch((error) => {
+    console.error('An error occurred while posting the tweet:', error);
+    if (error.errors) {
+      console.error('Twitter API errors:', error.errors);
+    }
+  });
