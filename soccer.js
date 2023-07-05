@@ -1,43 +1,39 @@
 const puppeteer = require('puppeteer');
+const cheerio = require('cheerio');
 
-// Initiating Puppeteer
-puppeteer.launch({executablePath: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome'})
-  .then(async browser => {
-    // Opening a new page and navigating to Flashscore
-    const page = await browser.newPage();
-    await page.goto('https://www.kooora.com/');
-    await page.waitForSelector('tbody');
+const scrapedQuotes = [];
 
-    // Manipulating the page's content
-    const grabMatches = await page.evaluate(() => {
-      const allLiveMatches = document.querySelectorAll('#mainContent');
-      const scrapeItems = [];
-
-      allLiveMatches.forEach(item => {
-        try {
-          const homeTeam = item.querySelector('#jm1x2.z').innerText;
-          const awayTeam = item.querySelector('#jm1x4.z').innerText;
-
-          scrapeItems.push({
-            homeTeam: homeTeam,
-            awayTeam: awayTeam,
-          });
-        } catch (err) {}
-      });
-
-      const items = {
-        liveMatches: scrapeItems,
-      };
-      return items;
-    });
-
-    // Outputting the scraped data
-    console.log(grabMatches);
-
-    // Closing the browser
-    await browser.close();
-  })
-  // Handling any errors
-  .catch(function (err) {
-    console.error(err);
+(async () => {
+  // Launching and opening our page
+  const browser = await puppeteer.launch({
+    executablePath: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome',
   });
+  const page = await browser.newPage();
+
+  await page.goto('https://quotes.toscrape.com/');
+
+  // Getting access to the raw HTML
+  const pageData = await page.evaluate(() => {
+    return {
+      html: document.documentElement.innerHTML,
+    };
+  });
+
+  // Parsing the HTML and picking our elements
+  const $ = cheerio.load(pageData.html);
+  const quoteCards = $('div.quote');
+  quoteCards.each((index, element) => {
+    const quote = $(element).find('span.text').text();
+    const author = $(element).find('.author').text();
+
+    scrapedQuotes.push({
+      Quote: quote,
+      By: author,
+    });
+  });
+
+  console.log(scrapedQuotes);
+
+  // Closing the browser
+  await browser.close();
+})();

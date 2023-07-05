@@ -1,46 +1,47 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-  try {
-    // Launch the browser
-    const browser = await puppeteer.launch({ executablePath: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome' });
+  const browser = await puppeteer.launch({
+    executablePath: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome',
+  });
+  const page = await browser.newPage();
 
-    // Open a new page
-    const page = await browser.newPage();
+  // Set the navigation timeout to 60 seconds (60000 milliseconds)
+  await page.setDefaultNavigationTimeout(60000);
 
-    // Navigate to the website
-    await page.goto('https://www.kooora.com/');
+  // Navigate to the website
+  await page.goto('https://www.kooora.com/');
 
-    try {
-      await page.waitForSelector('.match_league', { timeout: 60000 });
-    } catch (error) {
-      console.error('Timeout error: Waiting for selector failed');
-      await browser.close();
-      return;
-    }
+  // Wait for the page to load completely
+  await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
-    // Scrape the matches
-    const matches = await page.evaluate(() => {
-      const matchElements = document.querySelectorAll('.match_league ');
-      const matches = [];
+  // Click on the "Matches" tab
+  await page.click('#topmenu > ul > li:nth-child(2) > a');
 
-      matchElements.forEach((matchElement) => {
-        const homeTeam = matchElement.querySelector('.tl').innerText;
-        const awayTeam = matchElement.querySelector('.tl').innerText;
-        const score = matchElement.querySelector('.font').innerText;
+  // Wait for the matches section to load
+  await page.waitForSelector('#matcheslive');
 
-        matches.push({ homeTeam, awayTeam, score });
-      });
+  // Get today's date in the format used by the website
+  const today = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 
-      return matches;
-    });
+  // Extract the matches for today
+  const matches = await page.$$eval(
+    `#matcheslive .table.matches.today tbody tr[data-mat-date="${today}"]`,
+    (rows) =>
+      rows.map((row) => ({
+        time: row.querySelector('.time').textContent.trim(),
+        teams: row.querySelector('.team').textContent.trim(),
+        score: row.querySelector('.score').textContent.trim(),
+      }))
+  );
 
-    // Output the scraped matches
-    console.log(matches);
+  // Console log the matches
+  console.log(matches);
 
-    // Close the browser
-    await browser.close();
-  } catch (error) {
-    console.error('An error occurred:', error);
-  }
+  // Close the browser
+  await browser.close();
 })();
