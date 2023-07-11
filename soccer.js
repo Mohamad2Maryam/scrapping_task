@@ -1,39 +1,35 @@
-const puppeteer = require('puppeteer');
+const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
 
-const scrapedQuotes = [];
+async function scrapeMatches() {
+  try {
+    const response = await axios.get('https://www.kooora.com/default.aspx?region=-1&dd=1&mm=3&yy=2013&area=0&ajax=99');
+    const $ = cheerio.load(response.data);
 
-(async () => {
-  // Launching and opening our page
-  const browser = await puppeteer.launch({
-    executablePath: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome',
-  });
-  const page = await browser.newPage();
+    const matchElements = $('tbody');
+    const matches = [];
 
-  await page.goto('https://quotes.toscrape.com/');
 
-  // Getting access to the raw HTML
-  const pageData = await page.evaluate(() => {
-    return {
-      html: document.documentElement.innerHTML,
-    };
-  });
+    matchElements.each((index, element) => {
+      const match = {};
 
-  // Parsing the HTML and picking our elements
-  const $ = cheerio.load(pageData.html);
-  const quoteCards = $('div.quote');
-  quoteCards.each((index, element) => {
-    const quote = $(element).find('span.text').text();
-    const author = $(element).find('.author').text();
+      // Extract the required information from the element
+      match.date = $(element).find('.match_time').text();
+      match.team1 = $(element).find('.zw').text();
+      match.team2 = $(element).find('.zl').text();
+      match.score = $(element).find('.sc').text();
 
-    scrapedQuotes.push({
-      Quote: quote,
-      By: author,
+      matches.push(match);
     });
-  });
 
-  console.log(scrapedQuotes);
+    // Save the matches array as JSON
+    const jsonData = JSON.stringify(matches, null, 2);
+    fs.writeFileSync('matches.json', jsonData);
+    console.log('Data saved successfully!');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
 
-  // Closing the browser
-  await browser.close();
-})();
+scrapeMatches();
